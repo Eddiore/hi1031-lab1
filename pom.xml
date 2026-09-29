@@ -7,6 +7,11 @@
     <groupId>org.example</groupId>
     <artifactId>hi1031-lab1</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <build>
+        <finalName>lab1</finalName>
+    </build>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -14,4 +19,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
