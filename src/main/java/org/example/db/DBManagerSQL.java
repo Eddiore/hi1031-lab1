@@ -2,10 +2,10 @@ package org.example.db;
 
 import java.sql.*;
 
-public class DBManager {
+public class DBManagerSQL {
     private final Connection dbConnection;
 
-    private DBManager() {
+    private DBManagerSQL() {
         String url = "jdbc:mysql://mysql:3306/Webshop";
         String user = "webapp_user";
         String password = "Abcde123#";
@@ -19,10 +19,10 @@ public class DBManager {
     }
 
     private static class InstanceHolder {
-        private static final DBManager INSTANCE = new DBManager();
+        private static final DBManagerSQL INSTANCE = new DBManagerSQL();
     }
 
-    public static DBManager getInstance() {
+    public static DBManagerSQL getInstance() {
         return InstanceHolder.INSTANCE;
     }
 

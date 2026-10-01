@@ -1,15 +1,26 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.4
-    container_name: mysql-hi1031
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb-hi1031
     ports:
-      - "3306:3306"
+      - "27017:27017"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mongodb-data:/data/db
     environment:
-      MYSQL_ROOT_PASSWORD: <placeholder>
+      MONGODB_INITDB_ROOT_USERNAME: admin
+      MONGODB_INITDB_ROOT_PASSWORD: <placeholder>
+
+#  mysql:
+#    image: mysql:8.4
+#    container_name: mysql-hi1031
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - mysql-data:/var/lib/mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: <placeholder>
 
   tomcat:
     image: tomcat:jre25-temurin-jammy
@@ -19,7 +30,8 @@ services:
     volumes:
       - <placeholder>:/usr/local/tomcat/webapps/lab1.war
     depends_on:
-      - mysql
+      - mongodb
 
 volumes:
   mysql-data:
+  mongodb-data:

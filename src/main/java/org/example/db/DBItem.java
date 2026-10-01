@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DBItem  {
     public static List<Item> getAllItems() {
-        Connection connection = DBManager.getDatabase();
+        Connection connection = DBManagerSQL.getDatabase();
         List<Item> out = new ArrayList<>();
 
         String query = "SELECT * FROM T_Items";
