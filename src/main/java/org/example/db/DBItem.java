@@ -1,50 +1,32 @@
 package org.example.db;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import org.example.bo.Item;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBItem  {
-    private static MongoCollection<Document> collection = null;
-
-//    public DBItem() {
-//        collection = DBManager.getDatabase().getCollection("items");
-//    }
-
     public static List<Item> getAllItems() {
-        if (collection == null) {
-            collection = DBManager.getDatabase().getCollection("items");
-        }
+        Connection connection = DBManager.getDatabase();
+        List<Item> out = new ArrayList<>();
 
-        ArrayList<Item> wArray = new ArrayList<>();
-        List<Document> allItems;
-        try {
-            allItems = collection.find().into(new ArrayList<>());
-        } catch (MongoException e) {
-            System.out.println("Collection not found...");
-            return null; // TEMP!!!
-        }
+        String query = "SELECT * FROM T_Items";
+        try (Statement s = connection.createStatement()) {
+            try (ResultSet rs = s.executeQuery(query)) {
+                while (rs.next()) {
+                    out.add(new Item(rs.getInt("itemId"),
+                            rs.getString("name"),
+                            rs.getString("description")));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Unable to query database for items!", e);
+            }
+        } catch (SQLException ignored) {}
 
-        for (Document doc : allItems) {
-            wArray.add(new Item(doc.getObjectId("_id").toString(), doc.getString("name"), doc.getString("description")));
-        }
-
-        return wArray;
+        return out;
     }
-
-//    public DBItem getItemWithName(String name) {
-//        Document doc = collection.find(Filters.eq("name", name)).first();
-//
-//        assert doc != null;
-//        DBItem dbItem = new DBItem(doc.getString("_id"),
-//                                 doc.getString("name"),
-//                                 doc.getString("description"));
-//
-//        return dbItem;
-//    }
-
 }
