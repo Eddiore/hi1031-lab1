@@ -6,18 +6,20 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
-public class DBManagerMongo {
+public class DBManager {
     private MongoClient mongoClient = null;
     private final MongoDatabase database;
 
-    private DBManagerMongo() {
-        String host = "mongodb:27017/Webshop";
-        String username = "webapp_user";
-        String password = "Abcde123%23";
+    private DBManager() {
+        String databaseName = "Webshop";
+        String username = "webshop_user";
+        String password = System.getenv("WEBSHOP_PASSWORD");
+
+        String uri = "mongodb://" + username + ":" + password + "@mongodb:27017/" + databaseName;
 
         try {
-            this.mongoClient = MongoClients.create("mongodb://webapp_user:Abcde123%23@mongodb:27017/Webshop"); //doesn't throw exceptions...
-            this.database = mongoClient.getDatabase("Webshop");
+            this.mongoClient = MongoClients.create(uri);
+            this.database = mongoClient.getDatabase(databaseName);
 
             database.runCommand(new Document("ping", 1).append("maxTimeMS", 500));
         } catch (MongoException e) {
@@ -28,10 +30,10 @@ public class DBManagerMongo {
     }
 
     private static class InstanceHolder {
-        private static final DBManagerMongo INSTANCE = new DBManagerMongo();
+        private static final DBManager INSTANCE = new DBManager();
     }
 
-    public static DBManagerMongo getInstance() {
+    public static DBManager getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
