@@ -9,8 +9,9 @@ services:
     volumes:
       - mongodb-data:/data/db
     environment:
+      MONGODB_INITDB_DATABASE: Webshop
       MONGODB_INITDB_ROOT_USERNAME: admin
-      MONGODB_INITDB_ROOT_PASSWORD: <placeholder>
+      MONGODB_INITDB_ROOT_PASSWORD: <PLACEHOLDER>
 
 #  mysql:
 #    image: mysql:8.4
@@ -28,7 +29,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - <placeholder>:/usr/local/tomcat/webapps/lab1.war
+      - <PLACEHOLDER>:/usr/local/tomcat/webapps/lab1.war
     depends_on:
       - mongodb
 

@@ -17,11 +17,11 @@ public class DBItem  {
         String query = "SELECT * FROM T_Items";
         try (Statement s = connection.createStatement()) {
             try (ResultSet rs = s.executeQuery(query)) {
-                while (rs.next()) {
-                    out.add(new Item(rs.getInt("itemId"),
-                            rs.getString("name"),
-                            rs.getString("description")));
-                }
+//                while (rs.next()) {
+//                    out.add(new Item(rs.getInt("itemId"),
+//                            rs.getString("name"),
+//                            rs.getString("description")));
+//                }
             } catch (SQLException e) {
                 throw new RuntimeException("Unable to query database for items!", e);
             }
