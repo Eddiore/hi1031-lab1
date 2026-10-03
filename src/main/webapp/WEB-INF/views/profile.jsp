@@ -1,6 +1,6 @@
 <h1>My Profile</h1>
 
-<p>Welcome, ${sessionScope.user.username}!</p>
+<p>Welcome, ${sessionScope.user.username}! Your role: ${sessionScope.user.role}</p>
 
 <%--<p>Email: ${sessionScope.user.email}</p>--%>
 

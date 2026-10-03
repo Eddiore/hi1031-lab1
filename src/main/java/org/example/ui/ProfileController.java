@@ -46,7 +46,7 @@ public class ProfileController extends HttpServlet {
             if (user != null) {
                 request.getSession().setAttribute("user", user);
 
-                response.sendRedirect(request.getContextPath() + "/controller/home");
+                response.sendRedirect(request.getContextPath() + "/controller/profile");
                 return;
             }
 

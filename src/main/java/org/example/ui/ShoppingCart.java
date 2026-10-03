@@ -22,8 +22,14 @@ public class ShoppingCart {
     }
 
 
-    public void removeItem(String productID) {
-        //Remove item by amount...?
+    public void removeItem(ItemDTO item) {
+        if (items.containsKey(item)) {
+            if (items.get(item) > 1) {
+                items.put(item, items.get(item) - 1);
+            } else {
+                items.remove(item);
+            }
+        }
     }
 
     public double getTotalPrice() {

@@ -34,11 +34,16 @@ public class CartController extends HttpServlet {
 
         if (action.equals("/add")) {
             String itemId = request.getParameter("itemId");
-
             ItemDTO item = Facade.getItemById(itemId);
-            cart.addItem(item);
 
+            cart.addItem(item);
             response.sendRedirect(request.getContextPath() + "/controller/products");
+        } else if (action.equals("/remove")) {
+            String itemId = request.getParameter("itemId");
+            ItemDTO item = Facade.getItemById(itemId);
+
+            cart.removeItem(item);
+            response.sendRedirect(request.getContextPath() + "/controller/cart");
         }
     }
 
