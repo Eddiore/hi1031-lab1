@@ -1,21 +1,39 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <nav class="navbar">
-    <a href="${pageContext.request.contextPath}/controller/home">
-        Home
-    </a>
 
-    <a href="${pageContext.request.contextPath}/controller/products">
-        Products
-    </a>
+    <div class="navbar-left">
+        <a href="${pageContext.request.contextPath}/controller/home">
+            Home
+        </a>
 
-    <a href="${pageContext.request.contextPath}/controller/login">
-        Login
-    </a>
+        <a href="${pageContext.request.contextPath}/controller/products">
+            Products
+        </a>
+    </div>
 
-    <a href="${pageContext.request.contextPath}/controller/cart/">
-        Cart
-    </a>
+    <div class="navbar-right">
+        <c:choose>
+            <c:when test="${not empty sessionScope.user}">
+                <span class="current-user">
+                    Current user: ${sessionScope.user.username}
+                </span>
+            </c:when>
 
-<%--    <form action="${pageContext.request.contextPath}/controller/cart" method="get">--%>
-<%--        <button type="submit">Cart</button>--%>
-<%--    </form>--%>
+            <c:otherwise>
+                <span class="current-user">
+                    Not logged in
+                </span>
+            </c:otherwise>
+        </c:choose>
+
+        <a href="${pageContext.request.contextPath}/controller/profile">
+            Profile
+        </a>
+
+        <a href="${pageContext.request.contextPath}/controller/cart/">
+            Cart
+        </a>
+
+    </div>
+
 </nav>

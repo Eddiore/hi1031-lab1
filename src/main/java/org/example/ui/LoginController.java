@@ -10,7 +10,7 @@ import org.example.bo.Facade;
 import java.io.IOException;
 
 @WebServlet("/login/*")
-public class LoginController extends HttpServlet {
+public class LoginController extends HttpServlet { /// Deprecated?
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,23 +33,23 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
-        UserDTO user = Facade.loginAsUser(username, password);
-
-        if (user != null) {
-            request.getSession().setAttribute("user", user);
-
-            response.sendRedirect(request.getContextPath() + "/controller/home");
-            return;
-        }
-
-        // --- Login failed ---
-        request.setAttribute("loginError","Invalid username or password");
-
-        request.setAttribute("contentPage", "login.jsp");
-
-        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+//        String username = request.getParameter("username");
+//        String password = request.getParameter("password");
+//
+//        UserDTO user = Facade.loginAsUser(username, password);
+//
+//        if (user != null) {
+//            request.getSession().setAttribute("user", user);
+//
+//            response.sendRedirect(request.getContextPath() + "/controller/home");
+//            return;
+//        }
+//
+//        // --- Login failed ---
+//        request.setAttribute("loginError","Invalid username or password");
+//
+//        request.setAttribute("contentPage", "login.jsp");
+//
+//        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
     }
 }

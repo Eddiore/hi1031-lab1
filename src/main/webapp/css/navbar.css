@@ -2,12 +2,28 @@
 .navbar {
     width: 100%;
     background-color: #555;
+    align-items: center;
     overflow: auto;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    float: left;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /*margin-left: auto;*/
+    float: right;
 }
 
 /* Navbar links */
 .navbar a {
-    float: left;
+    /*float: left;*/
     text-align: center;
     padding: 12px;
     color: white;
@@ -20,11 +36,17 @@
     background-color: #000;
 }
 
+.current-user {
+    color: #ffffff;
+    margin-left: 15px;
+    font-size: 14px;
+}
+
 
 /* Add responsiveness - will automatically display the navbar vertically instead of horizontally on screens less than 500 pixels */
-@media screen and (max-width: 500px) {
-    .navbar a {
-        float: none;
-        display: block;
-    }
-}
+/*@media screen and (max-width: 500px) {*/
+/*    .navbar a {*/
+/*        float: none;*/
+/*        display: block;*/
+/*    }*/
+/*}*/

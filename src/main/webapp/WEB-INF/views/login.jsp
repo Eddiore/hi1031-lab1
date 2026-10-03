@@ -1,7 +1,7 @@
 <h1>LOGIN</h1>
 
 <form method="post"
-      action="${pageContext.request.contextPath}/controller/login">
+      action="${pageContext.request.contextPath}/controller/profile/login">
 
     <label for="username">Username:</label>
     <input type="text"

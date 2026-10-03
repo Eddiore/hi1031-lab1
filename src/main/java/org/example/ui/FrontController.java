@@ -34,7 +34,6 @@ public class FrontController extends HttpServlet {
             return;
         }
 
-
         request.getRequestDispatcher(path).forward(request, response);
     }
 
