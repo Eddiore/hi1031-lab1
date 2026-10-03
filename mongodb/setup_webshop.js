@@ -16,6 +16,11 @@ db.createCollection("T_Items");
 db.createCollection("T_Orders");
 db.createCollection("T_Users");
 
+db.T_Items.createIndex(
+    { name: 1, category: 1 },
+    { unique: true }
+);
+
 db.T_Items.insertMany([
     {
         name: "Apple",
@@ -33,10 +38,15 @@ db.T_Items.insertMany([
     }
 ]);
 
+db.T_Users.createIndex(
+    { username: 1 },
+    { unique: true }
+);
+
 db.T_Users.insertMany([
     {
         username: "hans",
-        passwordHash: "$2a$12$33oqesNra/E.ZFCMPG5yjuNOunS4LM1NJl5ThmtWY2MWOXQXnH9Ga<",
+        passwordHash: "$2a$12$PEbbSceXMavk23T8Q6E1hOVMc9NeZj467KEACEpnFwo0o7RdRq6su",
         role: "ADMIN"
     },
     {
