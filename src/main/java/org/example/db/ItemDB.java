@@ -1,41 +1,41 @@
 package org.example.db;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.example.bo.Item;
 
-import javax.print.Doc;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDB {
-    private static MongoCollection<Document> collection = null;
-
-    private static void cacheCollection() {
-        if (collection == null) {
-            collection = DBManager.getDatabase().getCollection("T_Items");
-        }
+    private static Item itemFromResultSet(ResultSet result) throws SQLException {
+        return new Item(
+                result.getString("name"),
+                result.getString("description"),
+                result.getString("category"),
+                result.getInt("price"),
+                result.getInt("stock"),
+                result.getInt("id"));
     }
 
     public static List<Item> getAllItems() {
-        cacheCollection();
+        String sql = """
+                SELECT id, name, description, category, price, stock
+                FROM T_Items
+                """;
 
         List<Item> out = new ArrayList<>();
+        Connection connection = DBManager.getDatabase();
 
-        try {
-            List<Document> allItems = collection.find().into(new ArrayList<>());
-            for (Document doc : allItems) {
-                out.add(new Item(doc.getString("name"),
-                        doc.getString("description"),
-                        doc.getString("category"),
-                        doc.getInteger("price"),
-                        doc.getInteger("stock"),
-                        doc.getObjectId("_id").toString())
-                );
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
+
+            while (result.next()) {
+                out.add(itemFromResultSet(result));
             }
-        } catch (MongoException e) {
+        } catch (SQLException e) {
             System.out.println("Error getting all items: " + e.getMessage());
         }
 
@@ -43,51 +43,51 @@ public class ItemDB {
     }
 
     public static List<Item> getItemsByCategory(String category) {
-        cacheCollection();
+        String sql = """
+                SELECT id, name, description, category, price, stock
+                FROM T_Items
+                WHERE category = ?
+                """;
 
         List<Item> out = new ArrayList<>();
+        Connection connection = DBManager.getDatabase();
 
-        Document filter = new Document("category", category);
-        try {
-            List<Document> allItems = collection.find(filter).into(new ArrayList<>());
-            for (Document doc : allItems) {
-                out.add(new Item(doc.getString("name"),
-                        doc.getString("description"),
-                        doc.getString("category"),
-                        doc.getInteger("price"),
-                        doc.getInteger("stock"),
-                        doc.getObjectId("_id").toString())
-                );
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, category);
+
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    out.add(itemFromResultSet(result));
+                }
             }
-        } catch (MongoException e) {
+        } catch (SQLException e) {
             System.out.println("Error getting items from category: " + e.getMessage());
         }
 
         return out;
     }
 
-    public static Item getItemById(String id) {
-        cacheCollection();
+    public static Item getItemById(int id) {
+        String sql = """
+                SELECT id, name, description, category, price, stock
+                FROM T_Items
+                WHERE id = ?
+                """;
 
-        Item out = null;
+        Connection connection = DBManager.getDatabase();
 
-        Document filter = new Document("_id", new ObjectId(id));
-        try {
-            Document doc = collection.find(filter).first();
-            if (doc != null) {
-                out = new Item(
-                        doc.getString("name"),
-                        doc.getString("description"),
-                        doc.getString("category"),
-                        doc.getInteger("price"),
-                        doc.getInteger("stock"),
-                        doc.getObjectId("_id").toString()
-                );
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    return itemFromResultSet(result);
+                }
             }
-        } catch (MongoException e) {
+        } catch (SQLException e) {
             System.out.println("Error getting item by id: " + e.getMessage());
         }
 
-        return out;
+        return null;
     }
 }

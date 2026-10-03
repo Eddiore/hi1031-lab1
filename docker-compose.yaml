@@ -1,17 +1,31 @@
 services:
-  mongodb:
-    image: mongo:9.0
-    container_name: mongodb-hi1031
+  # mongodb:
+  #   image: mongo:9.0
+  #   container_name: mongodb-hi1031
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongodb-data:/data/db
+  #     - ./mongodb:/docker-entrypoint-initdb.d
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: admin
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  #     MONGO_INITDB_DATABASE: Webshop
+  #     WEBSHOP_PASSWORD: ${WEBSHOP_PASSWORD}
+
+  mysql:
+    image: mysql:8.4
+    container_name: mysql-hi1031
     ports:
-      - "27017:27017"
-    volumes:
-      - mongodb-data:/data/db
-      - ./mongodb:/docker-entrypoint-initdb.d
+      - "3306:3306"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: Webshop
-      WEBSHOP_PASSWORD: ${WEBSHOP_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: Webshop
+      MYSQL_USER: webshop_user
+      MYSQL_PASSWORD: ${WEBSHOP_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/setup_webshop.sql:/docker-entrypoint-initdb.d/setup_webshop.sql:ro
 
   tomcat:
     image: tomcat:jre25-temurin-jammy
@@ -23,7 +37,9 @@ services:
     environment:
       WEBSHOP_PASSWORD: ${WEBSHOP_PASSWORD}
     depends_on:
-      - mongodb
+      - mysql
+      # - mongodb
 
 volumes:
-  mongodb-data:
+  mysql-data:
+  # mongodb-data:

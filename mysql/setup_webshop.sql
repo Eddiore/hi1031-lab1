@@ -1,26 +1,50 @@
 CREATE DATABASE IF NOT EXISTS Webshop;
-
-CREATE USER IF NOT EXISTS "webshop_user" IDENTIFIED BY "<placeholder>";
-GRANT INSERT, UPDATE, DELETE, SELECT ON Webshop.* TO webshop_user;
-FLUSH PRIVILEGES;
-
 USE Webshop;
 
-CREATE TABLE IF NOT EXISTS T_Users (
-    userId INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    passwordHash VARCHAR(255) NOT NULL
+CREATE TABLE T_Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    passwordHash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS T_Items (
-    itemId INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    description VARCHAR(255) NOT NULL
+CREATE TABLE T_Items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    category VARCHAR(50) NOT NULL,
+    price INT NOT NULL,
+    stock INT NOT NULL
 );
 
-INSERT INTO T_Users(username, passwordHash)
-VALUES ('customer1', 'test');
+CREATE TABLE T_Orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
 
-INSERT INTO T_Items(name, description)
-VALUES ('Apple', 'Round and red'),
-       ('Pear', 'Oval and green');
+    FOREIGN KEY (userId)
+        REFERENCES T_Users(id)
+);
+
+CREATE TABLE T_OrderItems (
+    orderId INT NOT NULL,
+    itemId INT NOT NULL,
+    nrOfItems INT NOT NULL,
+    priceAtPurchase INT NOT NULL,
+
+    PRIMARY KEY (orderId, itemId),
+
+    FOREIGN KEY (orderId)
+        REFERENCES T_Orders(id),
+
+    FOREIGN KEY (itemId)
+        REFERENCES T_Items(id)
+);
+
+INSERT INTO T_Items (name, description, category, price, stock)
+VALUES  ('Apple', 'Round and red', 'Food', 6, 10),
+        ('Pear', 'Oval and green', 'Food', 5, 25);
+
+INSERT INTO T_Users (username, passwordHash, role)
+VALUES  ('hans', '$2a$12$PEbbSceXMavk23T8Q6E1hOVMc9NeZj467KEACEpnFwo0o7RdRq6su', 'ADMIN'),
+        ('helena', 'temporary', 'STAFF'),
+        ('anna', 'temporary', 'CUSTOMER');

@@ -6,7 +6,7 @@ public class User {
     private String username;
     private String passwordHash;
     private UserRole role;
-    private String id;
+    private int id;
 
     public User(String username, String passwordHash, UserRole role) {
         this.username = username;
@@ -14,7 +14,7 @@ public class User {
         this.role = role;
     }
 
-    public User(String username, String passwordHash, UserRole role, String id) {
+    public User(String username, String passwordHash, UserRole role, int id) {
         this(username, passwordHash, role);
         this.id = id;
     }
@@ -43,7 +43,7 @@ public class User {
         this.role = role;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 }

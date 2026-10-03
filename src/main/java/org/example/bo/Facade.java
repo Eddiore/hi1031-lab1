@@ -47,11 +47,9 @@ public class Facade {
     }
 
     public static ItemDTO getItemById(String id) {
-        Item item = ItemDB.getItemById(id);
+        Item item = ItemDB.getItemById(Integer.valueOf(id));
 
-        if (item == null) {
-            return null;
-        }
+        if (item == null) { return null; }
 
         return new ItemDTO(item.getName(),
                 item.getDescription(),

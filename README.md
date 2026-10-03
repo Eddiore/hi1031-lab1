@@ -8,6 +8,7 @@
 6. Create a `.env` file under the project root and add the following lines to the file (replacing \<placeholder\> with real passwords):
 ```text
 MONGO_PASSWORD=<placeholder>
+MYSQL_PASSWORD=<placeholder>
 WEBSHOP_PASSWORD=<placeholder>
 ```
 7. Open a terminal in project root and run: `docker compose up -d`

@@ -6,7 +6,7 @@ public class Item {
     private String category;
     private int price;
     private int stock;
-    private String id;
+    private int id;
 
     public Item(String name, String description, String category, int price, int stock) {
         this.name = name;
@@ -16,7 +16,7 @@ public class Item {
         this.stock = stock;
     }
 
-    public Item(String name, String description, String category, int price, int stock, String id) {
+    public Item(String name, String description, String category, int price, int stock, int id) {
         this(name , description , category, price, stock);
         this.id = id;
     }
@@ -41,7 +41,5 @@ public class Item {
 
     public void setStock(int stock) { this.stock = stock; }
 
-    public String getId() { return id; }
-
-    public void setId(String id) { this.id = id; }
+    public int getId() { return id; }
 }

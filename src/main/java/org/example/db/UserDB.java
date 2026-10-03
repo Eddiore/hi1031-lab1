@@ -1,41 +1,38 @@
 package org.example.db;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.*;
-import org.bson.Document;
 import org.example.bo.User;
 import org.example.bo.enums.UserRole;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class UserDB {
-    private static MongoCollection<Document> collection = null;
-
-    private static void cacheCollection() {
-        if (collection == null) {
-            collection = DBManager.getDatabase().getCollection("T_Users");
-        }
-    }
-
     public static User getUser(String username) {
-        cacheCollection();
+        String sql = """
+                SELECT id, username, passwordHash, role
+                FROM T_Users
+                WHERE username = ?
+                """;
 
-        Document filter = new Document("username", username);
+        Connection connection = DBManager.getDatabase();
 
-        try {
-            Document doc = collection.find(filter).first();
-            if (doc != null) {
-                return new User(doc.getString("username"),
-                        doc.getString("passwordHash"),
-                        UserRole.valueOf(doc.getString("role")),
-                        doc.getObjectId("_id").toString()
-                );
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
 
+            try (ResultSet result = statement.executeQuery()) {
+
+                if (result.next()) {
+                    return new User(
+                            result.getString("username"),
+                            result.getString("passwordHash"),
+                            UserRole.valueOf(result.getString("role")),
+                            result.getInt("id"));
+                }
             }
-        } catch (MongoException e) {
+        } catch (SQLException e) {
             System.out.println("Unable to login as user: " + username);
         }
 
@@ -43,43 +40,48 @@ public class UserDB {
     }
 
     public static boolean createUser(User user) {
-        cacheCollection();
+        String sql = """
+                INSERT INTO T_Users (username, passwordHash, role)
+                VALUES (?, ?, ?)
+                """;
 
-        Document filter = new Document("username", user.getUsername());
+        Connection connection = DBManager.getDatabase();
 
-        try {
-            List<Document> result = collection.find(filter).into(new ArrayList<>());
-            if (!result.isEmpty()) {
-                System.out.println("User already exists: " + user.getUsername());
-                return false;
-            }
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPasswordHash());
+            statement.setString(3, user.getRole().toString());
 
-            Document doc = new Document()
-                    .append("username", user.getUsername())
-                    .append("passwordHash", user.getPasswordHash())
-                    .append("role", user.getRole().toString());
-            collection.insertOne(doc);
-        } catch (MongoException e) {
+            statement.executeUpdate();
+            return true;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("User already exists: " + user.getUsername());
+            return false;
+        } catch (SQLException e) {
             System.out.println("Unable to create user: " + user.getUsername());
+            return false;
         }
-
-        return true;
     }
 
     public static boolean updateUser(User user) {
-        cacheCollection();
+        String sql = """
+                UPDATE T_Users
+                SET passwordHash = ?, role = ? WHERE username = ?
+                """;
 
-        Document filter = new Document("username", user.getUsername());
+        Connection connection = DBManager.getDatabase();
 
-        try {
-            collection.updateOne(eq(filter),
-                    combine(set("passwordHash", user.getPasswordHash()),set("role", user.getRole()))
-            );
-        } catch (MongoException e) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getPasswordHash());
+            statement.setString(2, user.getRole().toString());
+            statement.setString(3, user.getUsername());
+
+            int rowsUpdated = statement.executeUpdate();
+
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
             System.out.println("Unable to update user: " + user.getUsername());
             return false;
         }
-
-        return true;
     }
 }

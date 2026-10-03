@@ -1,31 +1,24 @@
 package org.example.db;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBManager {
-    private MongoClient mongoClient = null;
-    private final MongoDatabase database;
+    private Connection connection;
 
     private DBManager() {
-        String databaseName = "Webshop";
-        String username = "webshop_user";
+        String url = "jdbc:mysql://mysql:3306/Webshop";
+        String user = "webshop_user";
         String password = System.getenv("WEBSHOP_PASSWORD");
 
-        String uri = "mongodb://" + username + ":" + password + "@mongodb:27017/" + databaseName;
-
         try {
-            this.mongoClient = MongoClients.create(uri);
-            this.database = mongoClient.getDatabase(databaseName);
-
-            database.runCommand(new Document("ping", 1).append("maxTimeMS", 500));
-        } catch (MongoException e) {
-            System.out.println("Error when establishing connection to Database...");
-            if (mongoClient != null) { mongoClient.close(); }
-            throw new RuntimeException(e);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(url, user, password);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Could not load MySQL driver");
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to connect to MySQL Database!", e);
         }
     }
 
@@ -37,11 +30,7 @@ public class DBManager {
         return InstanceHolder.INSTANCE;
     }
 
-    public static MongoClient getClient() {
-        return getInstance().mongoClient;
-    }
-
-    public static MongoDatabase getDatabase() {
-        return getInstance().database;
+    public static Connection getDatabase() {
+        return getInstance().connection;
     }
 }
