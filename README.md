@@ -14,3 +14,5 @@ WEBSHOP_PASSWORD=<placeholder>
 8. Open a web browser and go to `http://localhost:27017/lab1`
 
 ## Credentials
+- **username:** hans
+- **password:** RandomPassword
