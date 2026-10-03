@@ -3,21 +3,21 @@ package org.example.ui;
 import java.util.HashMap;
 
 public class ShoppingCart {
-    private HashMap<String, Integer> items;
+    private HashMap<ItemDTO, Integer> items;
 
     public ShoppingCart() {
         this.items = new HashMap<>();
     }
 
-    public HashMap<String, Integer> getItems() {
+    public HashMap<ItemDTO, Integer> getItems() {
         return items;
     }
 
-    public void addItem(String itemID) {
-        if (items.containsKey(itemID)) {
-            items.put(itemID, items.get(itemID) + 1);
+    public void addItem(ItemDTO item) {
+        if (items.containsKey(item)) {
+            items.put(item, items.get(item) + 1);
         } else {
-            items.put(itemID, 1);
+            items.put(item, 1);
         }
     }
 

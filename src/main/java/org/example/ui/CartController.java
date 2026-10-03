@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.example.bo.Facade;
 
 import java.io.IOException;
 
@@ -19,9 +20,9 @@ public class CartController extends HttpServlet {
         ShoppingCart cart = getCartFromSession(request);
 
         request.setAttribute("cart", cart);
+        request.setAttribute("contentPage", "cart.jsp");
 
-        request.getRequestDispatcher("/cart.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
     }
 
     @Override
@@ -33,8 +34,11 @@ public class CartController extends HttpServlet {
 
         if (action.equals("/add")) {
             String itemId = request.getParameter("itemId");
-            cart.addItem(itemId);
-            response.sendRedirect("/lab1/index.jsp");
+
+            ItemDTO item = Facade.getItemById(itemId);
+            cart.addItem(item);
+
+            response.sendRedirect(request.getContextPath() + "/controller/products");
         }
     }
 

@@ -3,8 +3,10 @@ package org.example.db;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.example.bo.Item;
 
+import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +61,31 @@ public class ItemDB {
             }
         } catch (MongoException e) {
             System.out.println("Error getting items from category: " + e.getMessage());
+        }
+
+        return out;
+    }
+
+    public static Item getItemById(String id) {
+        cacheCollection();
+
+        Item out = null;
+
+        Document filter = new Document("_id", new ObjectId(id));
+        try {
+            Document doc = collection.find(filter).first();
+            if (doc != null) {
+                out = new Item(
+                        doc.getString("name"),
+                        doc.getString("description"),
+                        doc.getString("category"),
+                        doc.getInteger("price"),
+                        doc.getInteger("stock"),
+                        doc.getObjectId("_id").toString()
+                );
+            }
+        } catch (MongoException e) {
+            System.out.println("Error getting item by id: " + e.getMessage());
         }
 
         return out;

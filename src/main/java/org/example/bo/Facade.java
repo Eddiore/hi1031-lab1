@@ -46,11 +46,25 @@ public class Facade {
         return DTOs;
     }
 
+    public static ItemDTO getItemById(String id) {
+        Item item = ItemDB.getItemById(id);
+
+        if (item == null) {
+            return null;
+        }
+
+        return new ItemDTO(item.getName(),
+                item.getDescription(),
+                item.getCategory(),
+                item.getPrice(),
+                item.getStock(),
+                item.getId()
+        );
+    }
+
     public static UserDTO loginAsUser(String username, String password) {
         User user = UserDB.getUser(username);
         if (user == null) { return null; }
-
-        BCrypt.hashpw(password, BCrypt.gensalt(12));
 
         if (!BCrypt.checkpw(password, user.getPasswordHash())) { return null; }
 
