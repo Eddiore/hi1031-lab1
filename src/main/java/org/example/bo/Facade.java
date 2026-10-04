@@ -60,6 +60,47 @@ public class Facade {
         );
     }
 
+    public static List<UserDTO> getAllUsers() {
+        List<UserDTO> DTOs = new ArrayList<>();
+        List<User> users = UserDB.getAllUsers();
+
+        if (users == null || users.isEmpty()) return DTOs;
+
+        for (User user : users) {
+            DTOs.add(new UserDTO(
+                    user.getUsername(),
+                    user.getPasswordHash(),
+                    user.getRole(),
+                    user.getId()
+            ));
+        }
+
+        return DTOs;
+    }
+
+    public static UserDTO getUserById(String id) {
+        User user = UserDB.getUserById(Integer.parseInt(id));
+
+        if (user == null) { return null; }
+
+        return new UserDTO(
+                user.getUsername(),
+                user.getPasswordHash(),
+                user.getRole(),
+                user.getId()
+        );
+    }
+
+    public static boolean updateUser(UserDTO updateUser) {
+        User user = UserDB.getUserById(updateUser.id());
+        if (user == null) { return false; }
+
+        user.setRole(updateUser.role());
+        user.setUsername(updateUser.username());
+
+        return UserDB.updateUser(user);
+    }
+
     public static UserDTO loginAsUser(String username, String password) {
         User user = UserDB.getUser(username);
         if (user == null) { return null; }

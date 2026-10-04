@@ -8,8 +8,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDB {
+    private static User userFromResultSet(ResultSet result) throws SQLException {
+        return new User(
+                result.getString("username"),
+                result.getString("passwordHash"),
+                UserRole.valueOf(result.getString("role")),
+                result.getInt("id")
+        );
+    }
+
     public static User getUser(String username) {
         String sql = """
                 SELECT id, username, passwordHash, role
@@ -23,17 +34,36 @@ public class UserDB {
             statement.setString(1, username);
 
             try (ResultSet result = statement.executeQuery()) {
-
                 if (result.next()) {
-                    return new User(
-                            result.getString("username"),
-                            result.getString("passwordHash"),
-                            UserRole.valueOf(result.getString("role")),
-                            result.getInt("id"));
+                    return userFromResultSet(result);
                 }
             }
         } catch (SQLException e) {
             System.out.println("Unable to login as user: " + username);
+        }
+
+        return null;
+    }
+
+    public static User getUserById(int id) {
+        String sql = """
+                SELECT id, username, passwordHash, role
+                FROM T_Users
+                WHERE id = ?
+                """;
+
+        Connection connection = DBManager.getDatabase();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    return userFromResultSet(result);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Unable to retrieve user with id: " + id);
         }
 
         return null;
@@ -66,15 +96,15 @@ public class UserDB {
     public static boolean updateUser(User user) {
         String sql = """
                 UPDATE T_Users
-                SET passwordHash = ?, role = ? WHERE username = ?
+                SET role = ?, username = ? WHERE id = ?
                 """;
 
         Connection connection = DBManager.getDatabase();
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, user.getPasswordHash());
-            statement.setString(2, user.getRole().toString());
-            statement.setString(3, user.getUsername());
+            statement.setString(1, user.getRole().toString());
+            statement.setString(2, user.getUsername());
+            statement.setInt(3, user.getId());
 
             int rowsUpdated = statement.executeUpdate();
 
@@ -83,5 +113,27 @@ public class UserDB {
             System.out.println("Unable to update user: " + user.getUsername());
             return false;
         }
+    }
+
+    public static List<User> getAllUsers() {
+        String sql = """
+                SELECT id, username, passwordHash, role FROM T_Users
+                """;
+
+        List<User> out = new ArrayList<>();
+        Connection connection = DBManager.getDatabase();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet result = statement.executeQuery()) {
+
+            while (result.next()) {
+                out.add(userFromResultSet(result));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Unable to retrieve all users: " + e.getMessage());
+        }
+
+        return out;
     }
 }
