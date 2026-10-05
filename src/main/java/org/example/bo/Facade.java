@@ -5,9 +5,11 @@ import org.example.db.ItemDB;
 import org.example.db.OrderDB;
 import org.example.db.UserDB;
 import org.example.ui.ItemDTO;
+import org.example.ui.OrderDTO;
 import org.example.ui.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.lang.model.type.ArrayType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,5 +198,122 @@ public class Facade {
                 DTO.price(),
                 DTO.stock(),
                 DTO.id());
+    }
+
+    /**
+     * Returns all orders with the specified status.
+     *
+     * @param status the status to filter orders by
+     * @return a list of matching orders as OrderDTO objects
+     */
+    public static List<OrderDTO> getOrdersByStatus(OrderStatus status) {
+        List<OrderDTO> DTOs = new ArrayList<>();
+        List<Order> orders = OrderDB.getOrdersByStatus(status);
+
+        if(orders == null || orders.isEmpty()) return DTOs;
+
+        for (Order order : orders) {
+            Map<ItemDTO, Integer> itemDTOs = getItemDTOs(order);
+
+            DTOs.add(new OrderDTO(
+                    order.getUsername(),
+                    order.getStatus(),
+                    itemDTOs,
+                    order.getId()
+            ));
+
+        }
+
+        return DTOs;
+    }
+
+    /**
+     * Assigns order to staff member.
+     *
+     * @param orderId the order's ID
+     * @param staffId the staff member's ID
+     * @return true if assignment was successful.
+     */
+    public static boolean assignOrderToStaff(int orderId, int staffId) {
+        return OrderDB.assignOrderToStaff(orderId, staffId);
+    }
+
+    /**
+     * Returns all orders assigned to the specified staff member.
+     *
+     * @param staffId the staff member's ID
+     * @return a list of assigned orders as OrderDTO objects
+     */
+    public static List<OrderDTO> getAssignedOrders(int staffId) {
+        List<OrderDTO> DTOs = new ArrayList<>();
+        List<Order> orders = OrderDB.getOrdersByAssignedStaff(staffId);
+
+        if(orders == null || orders.isEmpty()) return DTOs;
+
+        for (Order order : orders) {
+            Map<ItemDTO, Integer> itemDTOs = getItemDTOs(order);
+
+            DTOs.add(new OrderDTO(
+                    order.getUsername(),
+                    order.getStatus(),
+                    itemDTOs,
+                    order.getId()
+            ));
+
+        }
+
+        return DTOs;
+    }
+
+    private static Map<ItemDTO, Integer> getItemDTOs(Order order) {
+        Map<Item, Integer> orderItems = order.getItems();
+        Map<ItemDTO, Integer> itemDTOs = new HashMap<>();
+
+        for (Map.Entry<Item, Integer> entry : orderItems.entrySet()) {
+            Item item = entry.getKey();
+            Integer quantity = entry.getValue();
+
+            ItemDTO itemDTO = new ItemDTO(
+                    item.getName(),
+                    item.getDescription(),
+                    item.getCategory(),
+                    item.getPrice(),
+                    item.getStock(),
+                    item.getId()
+            );
+
+            itemDTOs.put(itemDTO, quantity);
+        }
+        return itemDTOs;
+    }
+
+    /**
+     * Updates order to be packaged.
+     *
+     * @param orderId the order's ID
+     * @return true if the order was updated successful, false otherwise
+     */
+    public static boolean packageOrder(int orderId) {
+        return OrderDB.packageOrder(orderId);
+    }
+
+    /**
+     * Updates an item's data.
+     *
+     * @param updateItem the item data to update
+     * @return true if the item was updated, false otherwise
+     */
+    public static boolean updateItem(ItemDTO updateItem) {
+        Item item = ItemDB.getItemById(updateItem.id());
+        if (item == null) {
+            return false;
+        }
+
+        item.setName(updateItem.name());
+        item.setDescription(updateItem.description());
+        item.setPrice(updateItem.price());
+        item.setStock(updateItem.stock());
+
+        return ItemDB.updateItem(item);
     }
 }

@@ -109,4 +109,36 @@ public class ItemDB {
 
         return null;
     }
+
+    /**
+     * Updates an existing item's values.
+     *
+     * @param item the item to update
+     * @return true if the item was updated, false otherwise
+     */
+    public static boolean updateItem(Item item) {
+        String sql = """
+                UPDATE T_Items
+                SET name = ?, description = ?, category = ?, price = ?, stock = ?
+                WHERE id = ?
+                """;
+
+        Connection connection = DBManager.getDatabase();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, item.getName());
+            statement.setString(2, item.getDescription());
+            statement.setString(3, item.getCategory().toString());
+            statement.setInt(4, item.getPrice());
+            statement.setInt(5, item.getStock());
+            statement.setInt(6, item.getId());
+
+            int rowsUpdated = statement.executeUpdate();
+
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.out.println("Unable to update item: " + item.getName());
+            return false;
+        }
+    }
 }

@@ -23,6 +23,8 @@ public class ProfileController extends HttpServlet {
 
         if (user != null) {
             request.setAttribute("contentPage", "profile.jsp");
+            request.setAttribute("assignedOrders", Facade.getAssignedOrders(user.id()));
+
         } else {
             request.setAttribute("contentPage", "login.jsp");
         }

@@ -15,6 +15,43 @@ import org.example.bo.Order;
 import org.example.bo.enums.OrderStatus;
 
 public class OrderDB {
+    private static List<Order> getOrders(PreparedStatement statement) throws SQLException {
+        ResultSet result = statement.executeQuery();
+        Map<Integer, Order> orders = new HashMap<>();
+
+        while (result.next()) {
+            int orderId = result.getInt("orderId");
+
+            Order order = orders.get(orderId);
+
+            if (order == null) {
+                order = new Order(
+                        result.getString("customerUsername"),
+                        OrderStatus.valueOf(result.getString("status")),
+                        new HashMap<>(),
+                        orderId);
+
+                if (result.getObject("staffId") != null) {
+                    order.setAssignedStaffId(result.getInt("staffId"));
+                }
+
+                orders.put(orderId, order);
+            }
+
+            Item item = new Item(
+                    result.getString("name"),
+                    result.getString("description"),
+                    result.getString("category"),
+                    result.getInt("price"),
+                    result.getInt("stock"),
+                    result.getInt("itemId"));
+
+            order.addItem(item, result.getInt("nrOfItems"));
+        }
+
+        return new ArrayList<>(orders.values());
+    }
+
     /**
      * Retrieves all orders with the specified status.
      *
@@ -46,43 +83,7 @@ public class OrderDB {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, status.name());
-
-            ResultSet resultSet = statement.executeQuery();
-
-            Map<Integer, Order> orders = new HashMap<>();
-
-            while (resultSet.next()) {
-                int orderId = resultSet.getInt("orderId");
-
-                Order order = orders.get(orderId);
-
-                if (order == null) {
-                    order = new Order(
-                            resultSet.getString("customerUsername"),
-                            OrderStatus.valueOf(resultSet.getString("status")),
-                            new HashMap<>(),
-                            orderId);
-
-                    if (resultSet.getObject("staffId") != null) {
-                        order.setAssignedStaffId(resultSet.getInt("staffId"));
-                    }
-
-                    orders.put(orderId, order);
-                }
-
-                Item item = new Item(
-                        resultSet.getString("name"),
-                        resultSet.getString("description"),
-                        resultSet.getString("category"),
-                        resultSet.getInt("price"),
-                        resultSet.getInt("stock"),
-                        resultSet.getInt("itemId"));
-
-                order.addItem(item, resultSet.getInt("nrOfItems"));
-            }
-
-            return new ArrayList<>(orders.values());
-
+            return getOrders(statement);
         } catch (SQLException e) {
             System.out.println("Error getting orders with status: " + status);
             return null;
@@ -90,27 +91,65 @@ public class OrderDB {
     }
 
     /**
+     * Retrieves all orders with the specified staff id assigned to it.
+     *
+     * @param staffId the staff id to filter by
+     * @return a list of matching orders, or null if an error occurs
+     */
+    public static List<Order> getOrdersByAssignedStaff(int staffId) {
+        String sql = """
+                SELECT o.id AS orderId,
+                       u.username AS customerUsername,
+                       o.status,
+                       s.id AS staffId,
+                       i.id AS itemId,
+                       i.name,
+                       i.description,
+                       i.category,
+                       i.price,
+                       i.stock,
+                       oi.nrOfItems
+                FROM T_Orders o
+                JOIN T_Users u ON o.userId = u.id
+                LEFT JOIN T_Users s ON o.assignedStaffId = s.id
+                JOIN T_OrderItems oi ON o.id = oi.orderId
+                JOIN T_Items i ON oi.itemId = i.id
+                WHERE o.assignedStaffId = ?
+                """;
+
+        Connection connection = DBManager.getDatabase();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, staffId);
+            return getOrders(statement);
+        } catch (SQLException e) {
+            System.out.println("Error getting orders with staffID: " + staffId);
+            return null;
+        }
+    }
+
+    /**
      * Updates the status of an existing order.
      *
-     * @param order the order to update
+     * @param orderId the order to update
      * @return true if the order was updated, false otherwise
      */
-    public static boolean updateOrder(Order order) {
+    public static boolean packageOrder(int orderId) {
         String sql = """
                 UPDATE T_Orders
-                SET status = ?
+                SET status = 'PACKED'
                 WHERE id = ?
                 """;
         Connection connection = DBManager.getDatabase();
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, order.getId());
+            statement.setInt(1, orderId);
 
             if (statement.executeUpdate() == 0) {
                 return false;
             }
         } catch (SQLException e) {
-            System.out.println("Unable to update order: " + order.getId());
+            System.out.println("Unable to update order: " + orderId);
             return false;
         }
 
@@ -131,9 +170,9 @@ public class OrderDB {
         String sql = """
                 UPDATE T_Orders o
                 JOIN T_Users u ON u.id = ?
-                SET o.assignedStaffId = u.id
+                SET o.assignedStaffId = u.id, o.status = 'PACKING'
                 WHERE o.id = ?
-                  AND u.role = 'STAFF'
+                AND u.role = 'STAFF'
                 """;
 
         Connection connection = DBManager.getDatabase();

@@ -3,7 +3,7 @@ package org.example.ui;
 import java.util.HashMap;
 
 public class ShoppingCart {
-    private HashMap<ItemDTO, Integer> items;
+    private final HashMap<ItemDTO, Integer> items;
 
     public ShoppingCart() {
         this.items = new HashMap<>();

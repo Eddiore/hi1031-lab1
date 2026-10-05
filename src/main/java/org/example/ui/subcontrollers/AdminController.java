@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.bo.Facade;
 import org.example.bo.enums.UserRole;
+import org.example.ui.ItemDTO;
 import org.example.ui.UserDTO;
 
 import java.io.IOException;
@@ -32,7 +33,10 @@ public class AdminController extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 
         } else if (path.equals("/products")) {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            request.setAttribute("contentPage", "adminProductView.jsp");
+            request.setAttribute("productList", Facade.getAllItems());
+
+            request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 
         } else if (path.startsWith("/editUser")) {
             String id = request.getParameter("id");
@@ -41,7 +45,16 @@ public class AdminController extends HttpServlet {
             request.setAttribute("contentPage", "editUserView.jsp");
 
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+        } else if (path.startsWith("/editProduct")) {
+            String itemId = request.getParameter("id");
+
+            request.setAttribute("selectedItem", Facade.getItemById(itemId));
+            request.setAttribute("contentPage", "editProductView.jsp");
+
+            request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
         }
+
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
     @Override
@@ -65,10 +78,26 @@ public class AdminController extends HttpServlet {
             if (Facade.updateUser(updatedUser)) {
                 response.sendRedirect(request.getContextPath() + "/controller/admin/users");
             } else {
-                //Add error message to ui
-                response.sendRedirect(request.getContextPath() + "/controller/admin/users");
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } else if (path.equals("/updateProduct")) {
+            ItemDTO updatedItem = new ItemDTO(
+                    request.getParameter("name"),
+                    request.getParameter("description"),
+                    request.getParameter("category"),
+                    Integer.parseInt(request.getParameter("price")),
+                    Integer.parseInt(request.getParameter("stock")),
+                    Integer.parseInt(request.getParameter("id"))
+            );
+
+            if (Facade.updateItem(updatedItem)) {
+                response.sendRedirect(request.getContextPath() + "/controller/admin/products");
+            } else {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
+
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
     private boolean checkIfadmin(HttpServletRequest request) {
