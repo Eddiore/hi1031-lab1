@@ -61,7 +61,8 @@ public class OrderController extends HttpServlet {
 
         if (!Facade.placeOrder(user, cart.getItems())) {
             request.setAttribute("failedOrderMsg", "Order failed, please try again!");
-            response.sendRedirect(request.getContextPath() + "/controller/order");
+            request.setAttribute("contentPage", "orderView.jsp");
+            request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
         } else {
             request.setAttribute("contentPage", "orderSuccessView.jsp");
             request.getSession().removeAttribute("cart");

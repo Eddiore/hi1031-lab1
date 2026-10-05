@@ -231,7 +231,7 @@ public class OrderDB {
                         int rowsUpdated = statement.executeUpdate();
 
                         if (rowsUpdated != 1) {
-                            throw new IllegalStateException("Not enough stock for item: " + item.getName());
+                            throw new SQLException("Not enough stock for item: " + item.getName());
                         }
                     }
                 }
@@ -281,7 +281,6 @@ public class OrderDB {
         } catch (SQLException e) {
             System.out.println("Unable to place order");
             return false;
-            // throw new RuntimeException("Unable to place order", e);
         }
 
         return true;
