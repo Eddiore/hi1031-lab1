@@ -29,7 +29,6 @@ public class WarehouseController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,7 +40,6 @@ public class WarehouseController extends HttpServlet {
 
         String path = request.getPathInfo();
 
-
         if (path.equals("/assign")) {
             UserDTO user = (UserDTO) request.getSession().getAttribute("user");
             int orderId = Integer.parseInt(request.getParameter("orderId"));
@@ -50,7 +48,7 @@ public class WarehouseController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/controller/warehouse");
                 return;
             }
-            // Failed
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         } else if (path.equals("/package")) {
             int orderId = Integer.parseInt(request.getParameter("orderId"));
@@ -58,13 +56,12 @@ public class WarehouseController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/controller/profile");
                 return;
             }
-            // Fail
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
 
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
-
 
     private boolean checkIfAuthorized(HttpServletRequest request) {
         UserDTO user = (UserDTO) request.getSession().getAttribute("user");

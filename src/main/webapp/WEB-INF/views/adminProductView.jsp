@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<h2 class="adminProductView-title">Users</h2>
+<h2 class="adminProductView-title">Products</h2>
 
 <div class="product-list">
     <c:forEach var="item" items="${productList}">

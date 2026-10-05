@@ -31,13 +31,13 @@ public class AdminController extends HttpServlet {
             request.setAttribute("userList", Facade.getAllUsers());
 
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
-
+            return;
         } else if (path.equals("/products")) {
             request.setAttribute("contentPage", "adminProductView.jsp");
             request.setAttribute("productList", Facade.getAllItems());
 
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
-
+            return;
         } else if (path.startsWith("/editUser")) {
             String id = request.getParameter("id");
 
@@ -45,6 +45,7 @@ public class AdminController extends HttpServlet {
             request.setAttribute("contentPage", "editUserView.jsp");
 
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+            return;
         } else if (path.startsWith("/editProduct")) {
             String itemId = request.getParameter("id");
 
@@ -52,6 +53,7 @@ public class AdminController extends HttpServlet {
             request.setAttribute("contentPage", "editProductView.jsp");
 
             request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+            return;
         }
 
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -73,13 +75,13 @@ public class AdminController extends HttpServlet {
                     request.getParameter("username"),
                     request.getParameter("passwordHash"),
                     UserRole.valueOf(request.getParameter("role")),
-                    Integer.parseInt(request.getParameter("id"))
-                    );
+                    Integer.parseInt(request.getParameter("id")));
             if (Facade.updateUser(updatedUser)) {
                 response.sendRedirect(request.getContextPath() + "/controller/admin/users");
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
+            return;
         } else if (path.equals("/updateProduct")) {
             ItemDTO updatedItem = new ItemDTO(
                     request.getParameter("name"),
@@ -87,14 +89,14 @@ public class AdminController extends HttpServlet {
                     request.getParameter("category"),
                     Integer.parseInt(request.getParameter("price")),
                     Integer.parseInt(request.getParameter("stock")),
-                    Integer.parseInt(request.getParameter("id"))
-            );
+                    Integer.parseInt(request.getParameter("id")));
 
             if (Facade.updateItem(updatedItem)) {
                 response.sendRedirect(request.getContextPath() + "/controller/admin/products");
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
+            return;
         }
 
         response.sendError(HttpServletResponse.SC_NOT_FOUND);

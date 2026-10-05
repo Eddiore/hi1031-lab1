@@ -1,5 +1,5 @@
 
-<h2 class="adminProductView-title">Edit User: ${selectedItem.name}</h2>
+<h2 class="adminProductView-title">Edit Product: ${selectedItem.name}</h2>
 
 <div class="edit-product">
     <form action="${pageContext.request.contextPath}/controller/admin/updateProduct"
