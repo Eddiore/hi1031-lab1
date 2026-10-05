@@ -137,7 +137,7 @@ public class OrderDB {
     public static boolean packageOrder(int orderId) {
         String sql = """
                 UPDATE T_Orders
-                SET status = 'PACKED'
+                SET status = 'PACKAGED'
                 WHERE id = ?
                 """;
         Connection connection = DBManager.getDatabase();
@@ -172,7 +172,7 @@ public class OrderDB {
                 JOIN T_Users u ON u.id = ?
                 SET o.assignedStaffId = u.id, o.status = 'PACKING'
                 WHERE o.id = ?
-                AND u.role = 'STAFF'
+                AND u.role IN ('STAFF', 'ADMIN')
                 """;
 
         Connection connection = DBManager.getDatabase();
