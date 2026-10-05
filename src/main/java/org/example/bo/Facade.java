@@ -14,10 +14,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Facade {
+    /**
+     * Retrieves all items as DTOs.
+     *
+     * @return a list of all item DTOs
+     */
     public static List<ItemDTO> getAllItems() {
         List<ItemDTO> DTOs = new ArrayList<>();
         List<Item> items = ItemDB.getAllItems();
-        if (items == null || items.isEmpty()) { return DTOs; }
+        if (items == null || items.isEmpty()) {
+            return DTOs;
+        }
 
         for (Item item : items) {
             DTOs.add(new ItemDTO(item.getName(),
@@ -25,17 +32,24 @@ public class Facade {
                     item.getCategory(),
                     item.getPrice(),
                     item.getStock(),
-                    item.getId())
-            );
+                    item.getId()));
         }
 
         return DTOs;
     }
 
+    /**
+     * Retrieves items belonging to a category as DTOs.
+     *
+     * @param category the category to filter by
+     * @return a list of matching item DTOs
+     */
     public static List<ItemDTO> getItemsByCategory(String category) {
         List<ItemDTO> DTOs = new ArrayList<>();
         List<Item> items = ItemDB.getItemsByCategory(category);
-        if (items == null || items.isEmpty()) { return DTOs; }
+        if (items == null || items.isEmpty()) {
+            return DTOs;
+        }
 
         for (Item item : items) {
             DTOs.add(new ItemDTO(item.getName(),
@@ -43,61 +57,87 @@ public class Facade {
                     item.getCategory(),
                     item.getPrice(),
                     item.getStock(),
-                    item.getId())
-            );
+                    item.getId()));
         }
 
         return DTOs;
     }
 
+    /**
+     * Retrieves an item by its ID.
+     *
+     * @param id the ID of the item
+     * @return the matching item DTO, or null if not found
+     */
     public static ItemDTO getItemById(String id) {
         Item item = ItemDB.getItemById(Integer.valueOf(id));
 
-        if (item == null) { return null; }
+        if (item == null) {
+            return null;
+        }
 
         return new ItemDTO(item.getName(),
                 item.getDescription(),
                 item.getCategory(),
                 item.getPrice(),
                 item.getStock(),
-                item.getId()
-        );
+                item.getId());
     }
 
+    /**
+     * Retrieves all users as DTOs.
+     *
+     * @return a list of all user DTOs
+     */
     public static List<UserDTO> getAllUsers() {
         List<UserDTO> DTOs = new ArrayList<>();
         List<User> users = UserDB.getAllUsers();
 
-        if (users == null || users.isEmpty()) return DTOs;
+        if (users == null || users.isEmpty())
+            return DTOs;
 
         for (User user : users) {
             DTOs.add(new UserDTO(
                     user.getUsername(),
                     user.getPasswordHash(),
                     user.getRole(),
-                    user.getId()
-            ));
+                    user.getId()));
         }
 
         return DTOs;
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return the matching user DTO, or null if not found
+     */
     public static UserDTO getUserById(String id) {
         User user = UserDB.getUserById(Integer.parseInt(id));
 
-        if (user == null) { return null; }
+        if (user == null) {
+            return null;
+        }
 
         return new UserDTO(
                 user.getUsername(),
                 user.getPasswordHash(),
                 user.getRole(),
-                user.getId()
-        );
+                user.getId());
     }
 
+    /**
+     * Updates a user's username and role.
+     *
+     * @param updateUser the user data to update
+     * @return true if the user was updated, false otherwise
+     */
     public static boolean updateUser(UserDTO updateUser) {
         User user = UserDB.getUserById(updateUser.id());
-        if (user == null) { return false; }
+        if (user == null) {
+            return false;
+        }
 
         user.setRole(updateUser.role());
         user.setUsername(updateUser.username());
@@ -105,15 +145,33 @@ public class Facade {
         return UserDB.updateUser(user);
     }
 
+    /**
+     * Authenticates a user using their username and password.
+     *
+     * @param username the username
+     * @param password the user's password
+     * @return the user DTO if authentication succeeds, otherwise null
+     */
     public static UserDTO loginAsUser(String username, String password) {
         User user = UserDB.getUser(username);
-        if (user == null) { return null; }
+        if (user == null) {
+            return null;
+        }
 
-        if (!BCrypt.checkpw(password, user.getPasswordHash())) { return null; }
+        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
+            return null;
+        }
 
         return new UserDTO(user.getUsername(), user.getPasswordHash(), user.getRole(), user.getId());
     }
 
+    /**
+     * Places an order for the specified user and items.
+     *
+     * @param user  the user placing the order
+     * @param items the items and quantities to order
+     * @return true if the order was successfully placed, false otherwise
+     */
     public static boolean placeOrder(UserDTO user, HashMap<ItemDTO, Integer> items) {
         HashMap<Item, Integer> itemMap = new HashMap<>();
 
@@ -125,8 +183,7 @@ public class Facade {
         Order order = new Order(
                 user.username(),
                 OrderStatus.PLACED,
-                itemMap
-        );
+                itemMap);
 
         return OrderDB.placeOrder(order);
     }
@@ -138,7 +195,6 @@ public class Facade {
                 DTO.category(),
                 DTO.price(),
                 DTO.stock(),
-                DTO.id()
-        );
+                DTO.id());
     }
 }

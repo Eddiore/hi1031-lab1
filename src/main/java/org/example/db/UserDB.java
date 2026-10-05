@@ -17,10 +17,15 @@ public class UserDB {
                 result.getString("username"),
                 result.getString("passwordHash"),
                 UserRole.valueOf(result.getString("role")),
-                result.getInt("id")
-        );
+                result.getInt("id"));
     }
 
+    /**
+     * Retrieves a user by username.
+     *
+     * @param username the username to search for
+     * @return the matching user, or null if not found
+     */
     public static User getUser(String username) {
         String sql = """
                 SELECT id, username, passwordHash, role
@@ -45,6 +50,12 @@ public class UserDB {
         return null;
     }
 
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id the ID of the user
+     * @return the matching user, or null if not found
+     */
     public static User getUserById(int id) {
         String sql = """
                 SELECT id, username, passwordHash, role
@@ -69,6 +80,12 @@ public class UserDB {
         return null;
     }
 
+    /**
+     * Creates a new user in the database.
+     *
+     * @param user the user to create
+     * @return true if the user was created, false otherwise
+     */
     public static boolean createUser(User user) {
         String sql = """
                 INSERT INTO T_Users (username, passwordHash, role)
@@ -93,6 +110,12 @@ public class UserDB {
         }
     }
 
+    /**
+     * Updates an existing user's username and role.
+     *
+     * @param user the user to update
+     * @return true if the user was updated, false otherwise
+     */
     public static boolean updateUser(User user) {
         String sql = """
                 UPDATE T_Users
@@ -115,6 +138,11 @@ public class UserDB {
         }
     }
 
+    /**
+     * Retrieves all users from the database.
+     *
+     * @return a list containing all users
+     */
     public static List<User> getAllUsers() {
         String sql = """
                 SELECT id, username, passwordHash, role FROM T_Users
@@ -124,7 +152,7 @@ public class UserDB {
         Connection connection = DBManager.getDatabase();
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet result = statement.executeQuery()) {
+                ResultSet result = statement.executeQuery()) {
 
             while (result.next()) {
                 out.add(userFromResultSet(result));

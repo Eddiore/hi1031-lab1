@@ -21,8 +21,12 @@ CREATE TABLE T_Orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
     status VARCHAR(50) NOT NULL,
+    assignedStaffId INT NULL,
 
     FOREIGN KEY (userId)
+        REFERENCES T_Users(id),
+
+    FOREIGN KEY (assignedStaffId)
         REFERENCES T_Users(id)
 );
 

@@ -26,10 +26,20 @@ public class DBManager {
         private static final DBManager INSTANCE = new DBManager();
     }
 
+    /**
+     * Returns the singleton instance of the database manager.
+     *
+     * @return the database manager instance
+     */
     public static DBManager getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
+    /**
+     * Returns the active database connection.
+     *
+     * @return the database connection
+     */
     public static Connection getDatabase() {
         return getInstance().connection;
     }

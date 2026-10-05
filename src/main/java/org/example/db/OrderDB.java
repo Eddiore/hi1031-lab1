@@ -15,11 +15,18 @@ import org.example.bo.Order;
 import org.example.bo.enums.OrderStatus;
 
 public class OrderDB {
+    /**
+     * Retrieves all orders with the specified status.
+     *
+     * @param status the order status to filter by
+     * @return a list of matching orders, or null if an error occurs
+     */
     public static List<Order> getOrdersByStatus(OrderStatus status) {
         String sql = """
                 SELECT o.id AS orderId,
-                       u.username,
+                       u.username AS customerUsername,
                        o.status,
+                       s.id AS staffId,
                        i.id AS itemId,
                        i.name,
                        i.description,
@@ -29,11 +36,12 @@ public class OrderDB {
                        oi.nrOfItems
                 FROM T_Orders o
                 JOIN T_Users u ON o.userId = u.id
+                LEFT JOIN T_Users s ON o.assignedStaffId = s.id
                 JOIN T_OrderItems oi ON o.id = oi.orderId
                 JOIN T_Items i ON oi.itemId = i.id
                 WHERE o.status = ?
                 """;
-        List<Order> out;
+
         Connection connection = DBManager.getDatabase();
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -50,15 +58,20 @@ public class OrderDB {
 
                 if (order == null) {
                     order = new Order(
-                            resultSet.getString("username"),
+                            resultSet.getString("customerUsername"),
                             OrderStatus.valueOf(resultSet.getString("status")),
                             new HashMap<>(),
                             orderId);
 
+                    if (resultSet.getObject("staffId") != null) {
+                        order.setAssignedStaffId(resultSet.getInt("staffId"));
+                    }
+
                     orders.put(orderId, order);
                 }
 
-                Item item = new Item(resultSet.getString("name"),
+                Item item = new Item(
+                        resultSet.getString("name"),
                         resultSet.getString("description"),
                         resultSet.getString("category"),
                         resultSet.getInt("price"),
@@ -68,15 +81,20 @@ public class OrderDB {
                 order.addItem(item, resultSet.getInt("nrOfItems"));
             }
 
-            out = new ArrayList<>(orders.values());
+            return new ArrayList<>(orders.values());
+
         } catch (SQLException e) {
-            System.out.println("Error getting orders with status: " + status.toString());
+            System.out.println("Error getting orders with status: " + status);
             return null;
         }
-
-        return out;
     }
 
+    /**
+     * Updates the status of an existing order.
+     *
+     * @param order the order to update
+     * @return true if the order was updated, false otherwise
+     */
     public static boolean updateOrder(Order order) {
         String sql = """
                 UPDATE T_Orders
@@ -88,7 +106,9 @@ public class OrderDB {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, order.getId());
 
-            if (statement.executeUpdate() == 0) { return false; }
+            if (statement.executeUpdate() == 0) {
+                return false;
+            }
         } catch (SQLException e) {
             System.out.println("Unable to update order: " + order.getId());
             return false;
@@ -97,6 +117,44 @@ public class OrderDB {
         return true;
     }
 
+    /**
+     * Assigns an order to a staff member.
+     * <p>
+     * The order can only be assigned if it has not already been assigned
+     * to another staff member.
+     *
+     * @param orderId the ID of the order to assign
+     * @param staffId the ID of the staff member to assign the order to
+     * @return true if the order was successfully assigned, false otherwise
+     */
+    public static boolean assignOrderToStaff(int orderId, int staffId) {
+        String sql = """
+                UPDATE T_Orders o
+                JOIN T_Users u ON u.id = ?
+                SET o.assignedStaffId = u.id
+                WHERE o.id = ?
+                  AND u.role = 'STAFF'
+                """;
+
+        Connection connection = DBManager.getDatabase();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, staffId);
+            statement.setInt(2, orderId);
+
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Unable to assign order " + orderId + " to staff " + staffId);
+            return false;
+        }
+    }
+
+    /**
+     * Places an order and updates the corresponding item stock.
+     *
+     * @param order the order to place
+     * @return true if the order was successfully placed, false otherwise
+     */
     public static boolean placeOrder(Order order) {
         String updateStockSql = """
                 UPDATE T_Items

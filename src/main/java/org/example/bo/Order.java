@@ -8,6 +8,7 @@ import java.util.Map;
 public class Order {
     private String username;
     private OrderStatus status;
+    private int assignedStaffId;
     private Map<Item, Integer> items;
     private int id;
 
@@ -33,6 +34,10 @@ public class Order {
     public OrderStatus getStatus() { return status; }
 
     public void setStatus(OrderStatus status) { this.status = status; }
+
+    public int getAssignedStaffId() { return assignedStaffId; }
+
+    public void setAssignedStaffId(int assignedStaffId) { this.assignedStaffId = assignedStaffId; }
 
     public Map<Item, Integer> getItems() {
         Map<Item, Integer> deepCopy = new HashMap<>();

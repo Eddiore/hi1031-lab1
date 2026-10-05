@@ -20,6 +20,11 @@ public class ItemDB {
                 result.getInt("id"));
     }
 
+    /**
+     * Retrieves all items from the database.
+     *
+     * @return a list of all items, or null if an error occurs
+     */
     public static List<Item> getAllItems() {
         String sql = """
                 SELECT id, name, description, category, price, stock
@@ -43,6 +48,12 @@ public class ItemDB {
         return out;
     }
 
+    /**
+     * Retrieves all items belonging to the specified category.
+     *
+     * @param category the category to filter by
+     * @return a list of matching items, or null if an error occurs
+     */
     public static List<Item> getItemsByCategory(String category) {
         String sql = """
                 SELECT id, name, description, category, price, stock
@@ -69,6 +80,12 @@ public class ItemDB {
         return out;
     }
 
+    /**
+     * Retrieves an item by its ID.
+     *
+     * @param id the ID of the item
+     * @return the matching item, or null if it does not exist
+     */
     public static Item getItemById(int id) {
         String sql = """
                 SELECT id, name, description, category, price, stock
