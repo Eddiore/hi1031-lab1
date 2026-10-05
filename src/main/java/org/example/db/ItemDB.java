@@ -37,6 +37,7 @@ public class ItemDB {
             }
         } catch (SQLException e) {
             System.out.println("Error getting all items: " + e.getMessage());
+            return null;
         }
 
         return out;
@@ -62,6 +63,7 @@ public class ItemDB {
             }
         } catch (SQLException e) {
             System.out.println("Error getting items from category: " + e.getMessage());
+            return null;
         }
 
         return out;

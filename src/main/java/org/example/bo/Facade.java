@@ -1,5 +1,6 @@
 package org.example.bo;
 
+import org.example.bo.enums.OrderStatus;
 import org.example.db.ItemDB;
 import org.example.db.OrderDB;
 import org.example.db.UserDB;
@@ -114,7 +115,6 @@ public class Facade {
     }
 
     public static boolean placeOrder(UserDTO user, HashMap<ItemDTO, Integer> items) {
-
         HashMap<Item, Integer> itemMap = new HashMap<>();
 
         for (Map.Entry<ItemDTO, Integer> entry : items.entrySet()) {
@@ -124,6 +124,7 @@ public class Facade {
 
         Order order = new Order(
                 user.username(),
+                OrderStatus.PLACED,
                 itemMap
         );
 
@@ -131,7 +132,6 @@ public class Facade {
     }
 
     private static Item convertToItem(ItemDTO DTO) {
-
         return new Item(
                 DTO.name(),
                 DTO.description(),
