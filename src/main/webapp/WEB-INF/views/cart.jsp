@@ -25,4 +25,21 @@
 
         </div>
     </c:forEach>
+
+    <c:choose>
+        <c:when test="${not empty cart.items}">
+            <div class="checkout-bar">
+                <span>Total: ${totalPrice} SEK</span>
+                <a href="${pageContext.request.contextPath}/controller/order">
+                    Proceed to checkout
+                </a>
+            </div>
+        </c:when>
+
+        <c:otherwise>
+            <div class="empty-container">
+                <p>Your Cart is empty!</p>
+            </div>
+        </c:otherwise>
+    </c:choose>
 </div>

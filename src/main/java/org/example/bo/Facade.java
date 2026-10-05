@@ -1,13 +1,16 @@
 package org.example.bo;
 
 import org.example.db.ItemDB;
+import org.example.db.OrderDB;
 import org.example.db.UserDB;
 import org.example.ui.ItemDTO;
 import org.example.ui.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Facade {
     public static List<ItemDTO> getAllItems() {
@@ -108,5 +111,34 @@ public class Facade {
         if (!BCrypt.checkpw(password, user.getPasswordHash())) { return null; }
 
         return new UserDTO(user.getUsername(), user.getPasswordHash(), user.getRole(), user.getId());
+    }
+
+    public static boolean placeOrder(UserDTO user, HashMap<ItemDTO, Integer> items) {
+
+        HashMap<Item, Integer> itemMap = new HashMap<>();
+
+        for (Map.Entry<ItemDTO, Integer> entry : items.entrySet()) {
+            Item item = convertToItem(entry.getKey());
+            itemMap.put(item, entry.getValue());
+        }
+
+        Order order = new Order(
+                user.username(),
+                itemMap
+        );
+
+        return OrderDB.placeOrder(order);
+    }
+
+    private static Item convertToItem(ItemDTO DTO) {
+
+        return new Item(
+                DTO.name(),
+                DTO.description(),
+                DTO.category(),
+                DTO.price(),
+                DTO.stock(),
+                DTO.id()
+        );
     }
 }

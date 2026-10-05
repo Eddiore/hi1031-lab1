@@ -1,4 +1,4 @@
-package org.example.ui;
+package org.example.ui.subcontrollers;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.example.bo.Facade;
+import org.example.ui.ItemDTO;
+import org.example.ui.ShoppingCart;
 
 import java.io.IOException;
 
@@ -20,6 +22,7 @@ public class CartController extends HttpServlet {
         ShoppingCart cart = getCartFromSession(request);
 
         request.setAttribute("cart", cart);
+        request.setAttribute("totalPrice", cart.getTotalCost());
         request.setAttribute("contentPage", "cart.jsp");
 
         request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);

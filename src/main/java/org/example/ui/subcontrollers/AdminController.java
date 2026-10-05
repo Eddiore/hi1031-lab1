@@ -1,4 +1,4 @@
-package org.example.ui;
+package org.example.ui.subcontrollers;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.bo.Facade;
 import org.example.bo.enums.UserRole;
+import org.example.ui.UserDTO;
 
 import java.io.IOException;
 

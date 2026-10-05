@@ -33,7 +33,7 @@ public class FrontController extends HttpServlet {
 
             return;
         }
-
+        // The null path fails because of path.equeals() earlier (line 21) but would endlessly loop here...
         request.getRequestDispatcher(path).forward(request, response);
     }
 

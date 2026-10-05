@@ -21,6 +21,15 @@ public class Item {
         this.id = id;
     }
 
+    public Item(Item other) {
+        this.name = other.name;
+        this.description = other.description;
+        this.category = other.category;
+        this.price = other.price;
+        this.stock = other.stock;
+        this.id = other.id;
+    }
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }

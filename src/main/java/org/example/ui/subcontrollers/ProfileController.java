@@ -1,4 +1,4 @@
-package org.example.ui;
+package org.example.ui.subcontrollers;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.bo.Facade;
+import org.example.ui.UserDTO;
 
 import java.io.IOException;
 
@@ -16,9 +17,7 @@ public class ProfileController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String path = request.getPathInfo();
-        System.out.println("Path in profile - " + path);
-
+//        String path = request.getPathInfo();
 
         UserDTO user = (UserDTO) request.getSession().getAttribute("user");
 

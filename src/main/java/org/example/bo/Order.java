@@ -20,7 +20,17 @@ public class Order {
 
     public void setUsername(String username) { this.username = username; }
 
-    public Map<Item, Integer> getItems() { return items; }
+    public Map<Item, Integer> getItems() {
+        Map<Item, Integer> deepCopy = new HashMap<>();
+
+        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
+            Item copiedItem = new Item(entry.getKey());
+
+            deepCopy.put(copiedItem, entry.getValue());
+        }
+
+        return deepCopy;
+    }
 
     public void setItems(Map<Item, Integer> items) { this.items = items; }
 

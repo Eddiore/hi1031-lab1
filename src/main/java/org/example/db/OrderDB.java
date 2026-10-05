@@ -11,7 +11,7 @@ import org.example.bo.Item;
 import org.example.bo.Order;
 
 public class OrderDB {
-    public static void placeOrder(Order order) {
+    public static boolean placeOrder(Order order) {
         String updateStockSql = """
                 UPDATE T_Items
                 SET stock = stock - ?
@@ -95,7 +95,11 @@ public class OrderDB {
                 throw e;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to place order", e);
+            System.out.println("Unable to place order");
+            return false;
+//            throw new RuntimeException("Unable to place order", e);
         }
+
+        return true;
     }
 }

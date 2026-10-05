@@ -21,7 +21,6 @@ public class ShoppingCart {
         }
     }
 
-
     public void removeItem(ItemDTO item) {
         if (items.containsKey(item)) {
             if (items.get(item) > 1) {
@@ -32,9 +31,20 @@ public class ShoppingCart {
         }
     }
 
-    public double getTotalPrice() {
+    public double getTotalCost() {
         double total = 0;
+        for (ItemDTO key : items.keySet()) {
+            total += (key.price() * items.get(key));
+        }
 
         return total;
+    }
+
+    public void clearCart() {
+        items.clear();
+    }
+
+    public boolean isEmpty() {
+        return items.isEmpty();
     }
 }
